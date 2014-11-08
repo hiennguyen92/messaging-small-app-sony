@@ -6,11 +6,15 @@
     android:layout_marginTop="20dp"
     android:gravity="center"
     android:orientation="vertical" >
-
-    <ListView
+    
+    <com.learnNcode.android.ExtendedListView
+        xmlns:clock="http://schemas.android.com/apk/res-auto"
         android:id="@+id/MainListView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-    </ListView>
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:choiceMode="singleChoice"
+        clock:scrollBarPanel="@layout/scrollbar"
+        clock:scrollBarPanelInAnimation="@anim/in"
+        clock:scrollBarPanelOutAnimation="@anim/out" />
 
 </LinearLayout>

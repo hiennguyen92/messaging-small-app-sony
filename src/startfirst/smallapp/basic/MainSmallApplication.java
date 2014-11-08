@@ -29,7 +29,10 @@
 
 package startfirst.smallapp.basic;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import startfirst.smallapp.adapter.AwesomeAdapter;
 import startfirst.smallapp.adapter.ConversationAdapter;
@@ -37,6 +40,10 @@ import startfirst.smallapp.model.Conversation;
 import startfirst.smallapp.model.SMS;
 import startfirst.smallapp.basic.R;
 
+import com.learnNcode.android.Clock;
+import com.learnNcode.android.ExtendedListView;
+import com.learnNcode.android.ExtendedListView.OnPositionChangedListener;
+import com.sony.smallapp.SdkInfo;
 import com.sony.smallapp.SmallAppWindow;
 import com.sony.smallapp.SmallApplication;
 
@@ -44,8 +51,10 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.provider.ContactsContract.PhoneLookup;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -56,9 +65,10 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainSmallApplication extends SmallApplication {
+public class MainSmallApplication extends SmallApplication implements OnPositionChangedListener {
 
 	ContentResolver contentResolver;
 	
@@ -66,7 +76,7 @@ public class MainSmallApplication extends SmallApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-        
+        setAppTheme(com.sony.smallapp.R.style.Theme.Dark);
         setMinimizedView(R.layout.minimized);
         setTitle(R.string.app_name);
         SmallAppWindow.Attributes attr = getWindow().getAttributes();
@@ -79,49 +89,30 @@ public class MainSmallApplication extends SmallApplication {
         contentResolver = getContentResolver();
 		setContentViewConversations();
 		
-//		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//			@Override
-//			public void onItemClick(AdapterView<?> l, View v,int pos, long id) {
-//				Conversation temp = (Conversation)l.getAdapter().getItem(pos);
-//				Cursor smsCur = contentResolver.query(Uri.parse("content://sms/"), new String[] { "address", "date", "body","type" },  "thread_id=" + temp.getThread_Id(), null, null);
-//				ArrayList<SMS> smsofconversation = new ArrayList<SMS>();
-//				while (smsCur.moveToNext()) {
-//					smsofconversation.add(new SMS(smsCur.getString(0), smsCur.getString(1), smsCur.getString(2), smsCur.getInt(3)));
-//				}
-//				setContentView(R.layout.chat);
-////				Intent iSMS = new Intent(MainSmallApplication.this, Test2Activity.class);
-////				iSMS.putExtra("DATA", smsofconversation);
-////				startActivity(iSMS);
-////				ListView lv2 = (ListView)findViewById(R.id.fragment_chat_listview_chat);
-////				lv2.setAdapter(new AwesomeAdapter(getBaseContext(), smsofconversation));
-//			}
-//		});
+		
         
         
     }
     
     private void setContentViewSMS(Conversation input){
+    	optionBack.setVisibility(View.VISIBLE);
     	setContentView(R.layout.chat);
     	ListView lv = (ListView)findViewById(R.id.ChatListView);
-    	Button btnBack = (Button)findViewById(R.id.ChatBtnBack);
     	Cursor smsCur = contentResolver.query(Uri.parse("content://sms/"), new String[] { "address", "date", "body","type" },  "thread_id=" + input.getThread_Id(), null, null);
 		ArrayList<SMS> smsofconversation = new ArrayList<SMS>();
 		while (smsCur.moveToNext()) {
 			smsofconversation.add(new SMS(smsCur.getString(0), smsCur.getString(1), smsCur.getString(2), smsCur.getInt(3)));
 		}
 		lv.setAdapter(new AwesomeAdapter(this, smsofconversation));
-    	btnBack.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				setContentViewConversations();
-			}
-		});
     }
     
     
     private void setContentViewConversations(){
+    	optionBack.setVisibility(View.GONE);
     	setContentView(R.layout.main);
-    	ListView lv = (ListView)findViewById(R.id.MainListView);
+    	ExtendedListView lv = (ExtendedListView)findViewById(R.id.MainListView);
+    	lv.setCacheColorHint(Color.TRANSPARENT);
+		lv.setOnPositionChangedListener(this);
     	lv.setOnItemClickListener(ConversationClick);
     	if (mConversations == null) {
     		Uri uri = Uri.parse("content://mms-sms/conversations/");
@@ -148,7 +139,26 @@ public class MainSmallApplication extends SmallApplication {
 	};
 	
 
-    
+	@SuppressWarnings("deprecation")
+	@Override
+	public void onPositionChanged(ExtendedListView listView, int position,View scrollBarPanel) {
+		Conversation obj = (Conversation)listView.getAdapter().getItem(position);
+		Date time = new Date(Long.parseLong(obj.getDate()));
+		
+		Clock mClock = (Clock) scrollBarPanel.findViewById(R.id.analogClockScroller);
+		TextView tv = (TextView) scrollBarPanel.findViewById(R.id.timeTextView);
+		TextView tvdate = (TextView)scrollBarPanel.findViewById(R.id.datetextView);
+		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		DateFormat timeFormat = new SimpleDateFormat("HH:mm");
+		tv.setText(timeFormat.format(time));
+		tvdate.setText(dateFormat.format(time));
+		
+		Time timeObj = new Time();
+		mClock.setSecondHandVisibility(false);
+		mClock.setVisibility(View.VISIBLE);
+		timeObj.set(time.getSeconds(), time.getMinutes(), time.getHours(), time.getDay(), time.getMonth(), time.getYear());
+		mClock.onTimeChanged(timeObj);	
+	}
     
     
     
@@ -173,7 +183,14 @@ public class MainSmallApplication extends SmallApplication {
 		return contactName;
 	}
 	
-    
+	private void setAppTheme(int theme) {
+        if (SdkInfo.VERSION.API_LEVEL >= 2) {
+        	
+            getWindow().setWindowTheme(theme);
+        } else {
+            Toast.makeText(this, "api not supported",Toast.LENGTH_SHORT).show();
+        }
+    }
     
     
 
@@ -192,10 +209,19 @@ public class MainSmallApplication extends SmallApplication {
         super.onDestroy();
     }
 
+    View optionBack,optionMenu;
     private void setupOptionMenu() {
-        View header = LayoutInflater.from(this).inflate(R.layout.header, null);
-
-        final View optionMenu = header.findViewById(R.id.option_menu);
+        LayoutInflater li = LayoutInflater.from(this);
+        View header = li.inflate(R.layout.header, null);
+        optionBack = header.findViewById(R.id.option_back);
+        optionBack.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				setContentViewConversations();
+			}
+		});
+        
+        optionMenu = header.findViewById(R.id.option_menu);
         optionMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -216,5 +242,7 @@ public class MainSmallApplication extends SmallApplication {
         /* Deploy the option menu in the header area of the titlebar */
         getWindow().setHeaderView(header);
     }
+
+
 
 }

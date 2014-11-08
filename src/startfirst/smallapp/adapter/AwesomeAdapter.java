@@ -62,15 +62,17 @@ public class AwesomeAdapter extends BaseAdapter{
 		LayoutParams lptime = (LayoutParams) holder.time.getLayoutParams();
 		if(message.getType() == Telephony.TextBasedSmsColumns.MESSAGE_TYPE_SENT)
 		{
-			holder.layoutroot.setBackgroundColor(Color.GRAY);
+			holder.layoutroot.setBackgroundResource(R.drawable.round_view_white_no_border);
 			lp.gravity = Gravity.RIGHT;
 			lptime.gravity = Gravity.RIGHT;
+			holder.message.setTextColor(Color.WHITE);
 		}
 		else
 		{
-			holder.layoutroot.setBackgroundColor(Color.BLUE);
+			holder.layoutroot.setBackgroundResource(R.drawable.round_view_white);
 			lp.gravity = Gravity.LEFT;
 			lptime.gravity = Gravity.LEFT;
+			holder.message.setTextColor(Color.BLACK);
 		}
 //		holder.time.setLayoutParams(lptime);
 //		if (!message.get_ChatTime().equals("null")) {
@@ -81,7 +83,7 @@ public class AwesomeAdapter extends BaseAdapter{
 //		}
 
 		holder.layout.setLayoutParams(lp);
-		holder.message.setTextColor(mContext.getResources().getColor(R.color.textColor));
+		//holder.message.setTextColor(mContext.getResources().getColor(R.color.textColor));
 		
 		return convertView;
 	}

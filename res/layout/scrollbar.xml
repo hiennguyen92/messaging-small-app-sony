@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" >
+
+    <RelativeLayout
+        android:id="@+id/scrollbar_panel_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/background_scrollbarpanel" >
+
+        <LinearLayout
+            android:id="@+id/clock_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:gravity="center_vertical" >
+
+            <com.learnNcode.android.Clock
+                xmlns:clock="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/analogClockScroller"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                clock:hand_dial="@drawable/ic_timer_clock_dialer"
+                clock:hand_hour="@drawable/ic_timer_clock_hour_hand"
+                clock:hand_minute="@drawable/ic_timer_clock_minute_hand"
+                clock:hand_second="@drawable/ic_timer_clock_minute_hand" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center_vertical"
+                android:paddingLeft="2dp" >
+
+                <TextView
+                    android:id="@+id/timeTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp"
+                    android:singleLine="true"
+                    android:text="test"
+                    android:textColor="#ffffffff"
+                    android:textSize="8sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/datetextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="10dp"
+                    android:singleLine="true"
+                    android:text="xx"
+                    android:textColor="#ffffffff"
+                    android:textSize="8sp" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+
+</RelativeLayout>
