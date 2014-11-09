@@ -15,6 +15,12 @@ public class Conversation implements Serializable{
 	public Conversation() {
 	}
 	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return this.mBody;
+	}
+	
 	public Conversation(String id, String addr, String name,String date, String body, int read) {
 		this.mThread_Id = id;
 		this.mAddress = addr;

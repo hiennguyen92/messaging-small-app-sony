@@ -2,7 +2,9 @@ package startfirst.smallapp.adapter;
 
 
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import startfirst.smallapp.basic.R;
 import startfirst.smallapp.model.Conversation;
@@ -38,6 +40,7 @@ public class AwesomeAdapter extends BaseAdapter{
 	public Object getItem(int position) {		
 		return mMessages.get(position);
 	}
+	@SuppressWarnings("deprecation")
 	@SuppressLint("SimpleDateFormat")
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
@@ -64,24 +67,34 @@ public class AwesomeAdapter extends BaseAdapter{
 		{
 			holder.layoutroot.setBackgroundResource(R.drawable.round_view_white_no_border);
 			lp.gravity = Gravity.RIGHT;
-			lptime.gravity = Gravity.RIGHT;
 			holder.message.setTextColor(Color.WHITE);
 		}
 		else
 		{
 			holder.layoutroot.setBackgroundResource(R.drawable.round_view_white);
 			lp.gravity = Gravity.LEFT;
-			lptime.gravity = Gravity.LEFT;
 			holder.message.setTextColor(Color.BLACK);
 		}
-//		holder.time.setLayoutParams(lptime);
+		lptime.gravity = Gravity.CENTER_HORIZONTAL;
+		holder.time.setLayoutParams(lptime);
 //		if (!message.get_ChatTime().equals("null")) {
 //			long val = Long.parseLong(message.get_ChatTime().substring(6, 19));
 //			Date date = new Date(val);
 //			SimpleDateFormat df2 = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
 //			holder.time.setText(df2.format(date));
 //		}
-
+		long val;
+		try {
+			val = Long.parseLong(message.getDate());
+		} catch (Exception e) {
+			val = new Date(message.getDate()).getTime();
+		}
+		 
+		Date date = new Date(val);
+		SimpleDateFormat df2 = new SimpleDateFormat("HH:mm dd/MM/yyyy");
+		holder.time.setText(df2.format(date));
+		
+		
 		holder.layout.setLayoutParams(lp);
 		//holder.message.setTextColor(mContext.getResources().getColor(R.color.textColor));
 		

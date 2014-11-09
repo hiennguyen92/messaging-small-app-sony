@@ -2,8 +2,8 @@
 <resources>
 
     <string name="app_name">Messaging</string>
-    <string name="menu1">New</string>
-    <string name="menu2">Settings</string>
+    <string name="themeDark">Theme Dark</string>
+    <string name="themeLight">Theme Light</string>
     <string name="menu_clicked">Menu item clicked.</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>

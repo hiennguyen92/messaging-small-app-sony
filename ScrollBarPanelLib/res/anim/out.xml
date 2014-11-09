@@ -6,9 +6,9 @@
 		android:fromAlpha="1.0"
 		android:toAlpha="0.2"
 		android:fillAfter="true"
-		android:duration="@android:integer/config_mediumAnimTime" />
+		android:duration="@android:integer/config_shortAnimTime" />
 	<translate
 	    android:fromXDelta="0%"
 	    android:toXDelta="50%"
-	    android:duration="@android:integer/config_longAnimTime" />
+	    android:duration="@android:integer/config_shortAnimTime" />
 </set>

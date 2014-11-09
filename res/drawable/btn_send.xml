@@ -1,0 +1,15 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/sendDarkColor"
+        android:state_focused="true"
+        android:state_pressed="true" />
+    <item android:drawable="@color/sendDarkColor"
+        android:state_focused="false"
+        android:state_pressed="true" />
+    <item android:drawable="@color/sendDarkColor" 
+        	android:state_focused="true" />
+    <item android:drawable="@color/barLightColor" 
+        	android:state_enabled="false" />
+    <item android:drawable="@color/sendLightColor"
+        android:state_focused="false"
+        android:state_pressed="false" />
+</selector>

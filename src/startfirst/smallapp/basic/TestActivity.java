@@ -107,10 +107,16 @@ public class TestActivity extends Activity implements OnPositionChangedListener 
 	}
 
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onPositionChanged(ExtendedListView listView, int position,View scrollBarPanel) {
 		Conversation obj = (Conversation)listView.getAdapter().getItem(position);
-		Date time = new Date(Long.parseLong(obj.getDate()));
+		Date time;
+		try {
+			time = new Date(Long.parseLong(obj.getDate()));
+		} catch (Exception e) {
+			time =  new Date(obj.getDate());
+		}
 		Clock mClock = (Clock) scrollBarPanel.findViewById(R.id.analogClockScroller);
 		TextView tv = (TextView) scrollBarPanel.findViewById(R.id.timeTextView);
 		TextView tvdate = (TextView)scrollBarPanel.findViewById(R.id.datetextView);

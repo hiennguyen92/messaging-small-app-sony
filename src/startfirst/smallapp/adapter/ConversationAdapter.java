@@ -3,10 +3,9 @@ package startfirst.smallapp.adapter;
 import java.util.ArrayList;
 
 import startfirst.smallapp.model.Conversation;
-
 import startfirst.smallapp.basic.R;
-
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,6 +54,14 @@ public class ConversationAdapter extends BaseAdapter{
 		}
 		hoverview.tv.setText(item.getName_Display() != null?item.getName_Display():item.getAddress());
 		hoverview.tv1.setText(item.getBody());
+		if (item.getRead() == 0) {
+			hoverview.tv.setTypeface(null, Typeface.BOLD);
+			hoverview.tv1.setTypeface(null, Typeface.BOLD);
+		}else {
+			hoverview.tv.setTypeface(null, Typeface.NORMAL);
+			hoverview.tv1.setTypeface(null, Typeface.NORMAL);
+		}
+		
 		return converView;
 	}
 
