@@ -65,15 +65,15 @@ public class AwesomeAdapter extends BaseAdapter{
 		LayoutParams lptime = (LayoutParams) holder.time.getLayoutParams();
 		if(message.getType() == Telephony.TextBasedSmsColumns.MESSAGE_TYPE_SENT)
 		{
-			holder.layoutroot.setBackgroundResource(R.drawable.round_view_white_no_border);
+			holder.layoutroot.setBackgroundResource(R.drawable.round_view_white);
 			lp.gravity = Gravity.RIGHT;
-			holder.message.setTextColor(Color.WHITE);
+			holder.message.setTextColor(Color.BLACK);
 		}
 		else
 		{
-			holder.layoutroot.setBackgroundResource(R.drawable.round_view_white);
+			holder.layoutroot.setBackgroundResource(R.drawable.round_view_white_no_border);
 			lp.gravity = Gravity.LEFT;
-			holder.message.setTextColor(Color.BLACK);
+			holder.message.setTextColor(Color.WHITE);
 		}
 		lptime.gravity = Gravity.CENTER_HORIZONTAL;
 		holder.time.setLayoutParams(lptime);

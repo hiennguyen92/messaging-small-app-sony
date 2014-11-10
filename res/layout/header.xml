@@ -42,6 +42,14 @@
         android:src="@drawable/ic_back" />
 
     <ImageView
+        android:id="@+id/option_new"
+        style="@android:style/Widget.DeviceDefault.Light.Button.Borderless.Small"
+        android:layout_width="48dp"
+        android:layout_height="wrap_content"
+        android:scaleType="centerInside"
+        android:src="@drawable/plus" />
+
+    <ImageView
         android:id="@+id/option_menu"
         style="@android:style/Widget.DeviceDefault.Light.Button.Borderless.Small"
         android:layout_width="48dp"

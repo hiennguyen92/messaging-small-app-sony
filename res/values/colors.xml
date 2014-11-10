@@ -15,5 +15,8 @@
 	<color name="barLightColor">#F2F2F2</color>
 	
 	<color name="TransparentGrey">#7F000000</color>
+	
+	<color name="blue">#ff2570ba</color>
+    <color name="grey">#f7f7f7</color>
 
 </resources>
