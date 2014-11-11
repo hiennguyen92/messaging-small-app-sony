@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import startfirst.smallapp.basic.R;
-import startfirst.smallapp.model.Conversation;
 import startfirst.smallapp.model.SMS;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -44,68 +43,47 @@ public class AwesomeAdapter extends BaseAdapter{
 	@SuppressLint("SimpleDateFormat")
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		SMS message = (SMS) this.getItem(mMessages.size()-1-position);
-		ViewHolder holder; 
+		SMS message = (SMS) this.getItem(mMessages.size()-1-position); 
 		if(convertView == null)
 		{
-			holder = new ViewHolder();
-			convertView = LayoutInflater.from(mContext).inflate(R.layout.sms_row, parent, false);
-			holder.layoutroot = (LinearLayout)convertView.findViewById(R.id.sms_row_root);
-			holder.layout = (LinearLayout)convertView.findViewById(R.id.sms_row_layout);
-			holder.message = (TextView) convertView.findViewById(R.id.message_text);
-			holder.time = (TextView)convertView.findViewById(R.id.sms_row_time);
-			convertView.setTag(holder);
+			LayoutInflater l = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			convertView = l.inflate(R.layout.sms_row, parent, false);
 		}
-		else
-			holder = (ViewHolder) convertView.getTag();
+
+		LinearLayout llLayoutRoot = startfirst.smallapp.widget.ViewHolder.get(convertView, R.id.sms_row_root);
+		LinearLayout llLayout = startfirst.smallapp.widget.ViewHolder.get(convertView, R.id.sms_row_layout);
+		TextView tvMessage = startfirst.smallapp.widget.ViewHolder.get(convertView, R.id.message_text);
+		TextView tvTime = startfirst.smallapp.widget.ViewHolder.get(convertView, R.id.sms_row_time);
 		
-		holder.message.setText(message.getBody());
+		tvMessage.setText(message.getBody());
 		
-		LayoutParams lp = (LayoutParams) holder.layout.getLayoutParams();
-		LayoutParams lptime = (LayoutParams) holder.time.getLayoutParams();
+		LayoutParams lp = (LayoutParams) llLayout.getLayoutParams();
+		LayoutParams lptime = (LayoutParams) tvTime.getLayoutParams();
 		if(message.getType() == Telephony.TextBasedSmsColumns.MESSAGE_TYPE_SENT)
 		{
-			holder.layoutroot.setBackgroundResource(R.drawable.round_view_white);
+			llLayoutRoot.setBackgroundResource(R.drawable.round_view_white);
 			lp.gravity = Gravity.RIGHT;
-			holder.message.setTextColor(Color.BLACK);
+			tvMessage.setTextColor(Color.BLACK);
 		}
 		else
 		{
-			holder.layoutroot.setBackgroundResource(R.drawable.round_view_white_no_border);
+			llLayoutRoot.setBackgroundResource(R.drawable.round_view_white_no_border);
 			lp.gravity = Gravity.LEFT;
-			holder.message.setTextColor(Color.WHITE);
+			tvMessage.setTextColor(Color.WHITE);
 		}
 		lptime.gravity = Gravity.CENTER_HORIZONTAL;
-		holder.time.setLayoutParams(lptime);
-//		if (!message.get_ChatTime().equals("null")) {
-//			long val = Long.parseLong(message.get_ChatTime().substring(6, 19));
-//			Date date = new Date(val);
-//			SimpleDateFormat df2 = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
-//			holder.time.setText(df2.format(date));
-//		}
+		tvTime.setLayoutParams(lptime);
 		long val;
 		try {
 			val = Long.parseLong(message.getDate());
 		} catch (Exception e) {
 			val = new Date(message.getDate()).getTime();
 		}
-		 
 		Date date = new Date(val);
 		SimpleDateFormat df2 = new SimpleDateFormat("HH:mm dd/MM/yyyy");
-		holder.time.setText(df2.format(date));
-		
-		
-		holder.layout.setLayoutParams(lp);
-		//holder.message.setTextColor(mContext.getResources().getColor(R.color.textColor));
-		
+		tvTime.setText(df2.format(date));
+		llLayout.setLayoutParams(lp);
 		return convertView;
-	}
-	private static class ViewHolder
-	{
-		LinearLayout layoutroot;
-		LinearLayout layout;
-		TextView message;
-		TextView time;
 	}
 
 	@Override

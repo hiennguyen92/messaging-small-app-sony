@@ -3,6 +3,7 @@ package startfirst.smallapp.adapter;
 import java.util.ArrayList;
 
 import startfirst.smallapp.model.Conversation;
+import startfirst.smallapp.widget.ViewHolder;
 import startfirst.smallapp.basic.R;
 import android.content.Context;
 import android.graphics.Typeface;
@@ -39,36 +40,28 @@ public class ConversationAdapter extends BaseAdapter{
 
 	@Override
 	public View getView(int position, View converView, ViewGroup parent) {
-		HoverView hoverview;
 		Conversation item = (Conversation)getItem(position);
+		
 		if (converView == null) {
 			LayoutInflater l = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			converView = l.inflate(R.layout.item_conversation, parent, false);
-			hoverview = new HoverView();
-			assert hoverview != null;
-			hoverview.tv = (TextView)converView.findViewById(R.id.item_conversation_name);
-			hoverview.tv1 = (TextView)converView.findViewById(R.id.item_conversation_body);
-			converView.setTag(hoverview);
-		} else {
-			hoverview = (HoverView) converView.getTag();
 		}
-		hoverview.tv.setText(item.getName_Display() != null?item.getName_Display():item.getAddress());
-		hoverview.tv1.setText(item.getBody());
+		
+		TextView tvTitle = ViewHolder.get(converView, R.id.item_conversation_name);
+		TextView tvContent = ViewHolder.get(converView, R.id.item_conversation_body);
+		tvTitle.setText(item.getName_Display() != null?item.getName_Display():item.getAddress());
+		tvContent.setText(item.getBody());
 		if (item.getRead() == 0) {
-			hoverview.tv.setTypeface(null, Typeface.BOLD);
-			hoverview.tv1.setTypeface(null, Typeface.BOLD);
+			tvTitle.setTypeface(null, Typeface.BOLD);
+			tvContent.setTypeface(null, Typeface.BOLD);
 		}else {
-			hoverview.tv.setTypeface(null, Typeface.NORMAL);
-			hoverview.tv1.setTypeface(null, Typeface.NORMAL);
+			tvTitle.setTypeface(null, Typeface.NORMAL);
+			tvContent.setTypeface(null, Typeface.NORMAL);
 		}
 		
 		return converView;
 	}
 
-	class HoverView{
-		TextView tv;
-		TextView tv1;
-	}
 	
 
 }

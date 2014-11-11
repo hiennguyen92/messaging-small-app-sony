@@ -5,6 +5,7 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 public class Conversation implements Serializable{
 
+	private String mId;
 	private String mThread_Id;
 	private String mAddress;
 	private String mName_Display;
@@ -17,12 +18,12 @@ public class Conversation implements Serializable{
 	
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		return this.mBody;
 	}
 	
-	public Conversation(String id, String addr, String name,String date, String body, int read) {
-		this.mThread_Id = id;
+	public Conversation(String id, String thread_id, String addr, String name,String date, String body, int read) {
+		this.mId = id;
+		this.mThread_Id = thread_id;
 		this.mAddress = addr;
 		this.mName_Display = name;
 		this.mDate = date;
@@ -30,6 +31,14 @@ public class Conversation implements Serializable{
 		this.mRead = read;
 	}
 	
+	
+	public String getId() {
+		return mId;
+	}
+
+	public void setId(String id) {
+		this.mId = id;
+	}
 	
 	public int getRead() {
 		return mRead;
