@@ -6,6 +6,8 @@ import startfirst.smallapp.model.SMSRepository;
 
 public class ApplicationConstants {
 
+	public static String ColorText = "#ffffff";
+	
 	private static ConversationRepository mConversationRepository;
 
 	public static ConversationRepository getConversationRepository(ContentResolver contentResolver) {

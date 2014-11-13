@@ -46,6 +46,7 @@ import startfirst.smallapp.model.ConversationRepository;
 import startfirst.smallapp.model.SMS;
 import startfirst.smallapp.widget.ApplicationConstants;
 import startfirst.smallapp.widget.AsyncJob;
+import startfirst.smallapp.widget.AsyncJob.OnMainThreadJob;
 import startfirst.smallapp.widget.MyToast;
 import startfirst.smallapp.widget.Utils;
 import startfirst.smallapp.widget.Utils.ViewType;
@@ -68,6 +69,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -91,6 +93,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
@@ -113,7 +116,14 @@ public class MainSmallApplication extends SmallApplication implements
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		setAppTheme(com.sony.smallapp.R.style.Theme.Dark);
+		String theme = Utils.readSharePreferences(MainSmallApplication.this, "THEME");
+		if (theme.equals("Dark")) {
+			setAppTheme(com.sony.smallapp.R.style.Theme.Dark);
+			ApplicationConstants.ColorText = "#ffffff";
+		}else {
+			setAppTheme(com.sony.smallapp.R.style.Theme.Light);
+			ApplicationConstants.ColorText = "#483D8B";
+		}
 		registerReceiver(IncomingSms, new IntentFilter(
 				"android.provider.Telephony.SMS_RECEIVED"));
 		setMinimizedView(R.layout.minimized);
@@ -140,6 +150,15 @@ public class MainSmallApplication extends SmallApplication implements
 		lvConversation.setCacheColorHint(Color.TRANSPARENT);
 		lvConversation.setOnPositionChangedListener(this);
 		lvConversation.setOnItemClickListener(ConversationClick);
+//		if (ApplicationConstants.ColorText.equals("#ffffff")) {//Light
+//			lvConversation.setDividerHeight(1);
+//			lvConversation.setDivider(getResources().getDrawable(R.drawable.divider_light));
+//		}else {
+//			lvConversation.setDividerHeight(1);
+//			lvConversation.setDivider(getResources().getDrawable(R.drawable.divider_light));
+//		}
+		
+		
 		if (mConversations != null) {
 			lvConversation.setAdapter(mAdapter);
 			mProgressBarMain.startAnimation(Utils.AnimationFadeOut());
@@ -209,7 +228,6 @@ public class MainSmallApplication extends SmallApplication implements
 				}
 			});
 		}else {
-			Toast.makeText(MainSmallApplication.this, "Create New COnversation", Toast.LENGTH_SHORT).show();
 			AsyncJob.doInBackground(new AsyncJob.OnBackgroundJob() {
 				@Override
 				public void doOnBackground() {
@@ -254,23 +272,31 @@ public class MainSmallApplication extends SmallApplication implements
 					AsyncJob.doInBackground(new AsyncJob.OnBackgroundJob() {
 						@Override
 						public void doOnBackground() {
-							Utils.sendSMSMessage(mContentResolver, input
-									.getAddress(), editContent.getText()
-									.toString());
-							AsyncJob.doOnMainThread(new AsyncJob.OnMainThreadJob() {
-								@Override
-								public void doInUIThread() {
-									mSMSs.add(0,
-											new SMS(null, input.getAddress(),
-													new Date().getTime() + "",
-													editContent.getText()
-															.toString(), 2, 1));
-									new MyToast(getApplicationContext(),
-											"SMS Send...").Show();
-									editContent.setText("");
-									adapter.notifyDataSetChanged();
-								}
-							});
+							try {
+								Utils.sendSMSMessage(mContentResolver, input.getAddress(), editContent.getText().toString());
+								AsyncJob.doOnMainThread(new AsyncJob.OnMainThreadJob() {
+									@Override
+									public void doInUIThread() {
+										mSMSs.add(0,
+												new SMS(null, input.getAddress(),
+														new Date().getTime() + "",
+														editContent.getText()
+																.toString(), 2, 1));
+										new MyToast(getApplicationContext(),
+												"SMS Send...").Show();
+										editContent.setText("");
+										adapter.notifyDataSetChanged();
+									}
+								});
+							} catch (final Exception e) {
+								AsyncJob.doOnMainThread(new OnMainThreadJob() {
+									@Override
+									public void doInUIThread() {
+										e.printStackTrace();
+										new MyToast(getApplicationContext(),"SMS faild, please try again.").Show();
+									}
+								});
+							}
 						}
 					});
 				} catch (Exception e) {
@@ -316,58 +342,68 @@ public class MainSmallApplication extends SmallApplication implements
 	}
 
 	 private List<Contact> listContact = new ArrayList<Contact>();
+	 ContanctAdapter adapterContact;
 	private void setContentViewFindContact() {
 		mViewType = ViewType.ViewFindContact;
 		optionBack.setVisibility(View.VISIBLE);
 		optionNew.setVisibility(View.GONE);
 		setTitle("Choice Contact");
 		setContentView(R.layout.find_contacts);
-		EditText editText = (EditText) findViewById(R.id.editTextFindContact);
-		ListView lv = (ListView) findViewById(R.id.listViewFindContact);
-
-		Cursor phones = getContentResolver().query(
-				ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null,
-				null, null);
-		while (phones.moveToNext()) {
-
-			String name = phones
-					.getString(phones
-							.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-
-			String phoneNumber = phones
-					.getString(phones
-							.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-
-			Contact objContact = new Contact();
-			objContact.setName(name);
-			objContact.setPhoneNo(phoneNumber);
-			listContact.add(objContact);
-
-		}
-		phones.close();
-
-		final ContanctAdapter objAdapter = new ContanctAdapter(
-				MainSmallApplication.this, R.layout.alluser_row, listContact);
-
-		lv.setAdapter(objAdapter);
-		lv.setOnItemClickListener(ContactItemClick);
-
-		editText.addTextChangedListener(new TextWatcher() {
+		final EditText editText = (EditText) findViewById(R.id.editTextFindContact);
+		final ListView lv = (ListView) findViewById(R.id.listViewFindContact);
+		final LinearLayout layoutContent = (LinearLayout)findViewById(R.id.linearLayoutContentFindContact);
+		final ProgressBar progrressBarLoading = (ProgressBar)findViewById(R.id.progressBarLoadingFindContact);
+		
+		AsyncJob.doInBackground(new AsyncJob.OnBackgroundJob() {
 			@Override
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
-				objAdapter.filter(s.toString());
-			}
+			public void doOnBackground() {
+				
+				Cursor phones = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null,null, null);
+				while (phones.moveToNext()) {
+					String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+					String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+					Contact objContact = new Contact();
+					objContact.setName(name);
+					objContact.setPhoneNo(phoneNumber);
+					listContact.add(objContact);
+				}
+				phones.close();
+				AsyncJob.doOnMainThread(new AsyncJob.OnMainThreadJob() {
+					@Override
+					public void doInUIThread() {
+						progrressBarLoading.startAnimation(Utils.AnimationFadeOut());
+						progrressBarLoading.setVisibility(View.GONE);
+						layoutContent.setVisibility(View.VISIBLE);
+						layoutContent.startAnimation(Utils.AnimationFadeIn());
+						
+						adapterContact = new ContanctAdapter(MainSmallApplication.this, R.layout.alluser_row, listContact);
+						lv.setAdapter(adapterContact);
+						lv.setOnItemClickListener(ContactItemClick);
 
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
-			}
+						editText.addTextChangedListener(new TextWatcher() {
+							@Override
+							public void onTextChanged(CharSequence s, int start, int before,
+									int count) {
+								adapterContact.filter(s.toString());
+							}
 
-			@Override
-			public void afterTextChanged(Editable arg0) {
+							@Override
+							public void beforeTextChanged(CharSequence s, int start, int count,
+									int after) {
+							}
+
+							@Override
+							public void afterTextChanged(Editable arg0) {
+							}
+						});
+					}
+				});
 			}
 		});
+		
+
+
+
 
 	}
 	OnItemClickListener ContactItemClick = new OnItemClickListener() {
@@ -436,12 +472,27 @@ public class MainSmallApplication extends SmallApplication implements
 
 						switch (item.getItemId()) {
 						case R.id.theme_Dark:
-							MainSmallApplication.this
-									.setAppTheme(com.sony.smallapp.R.style.Theme.Dark);
+							MainSmallApplication.this.setAppTheme(com.sony.smallapp.R.style.Theme.Dark);
+							ApplicationConstants.ColorText = "#ffffff";
+							Utils.writeSharePreferences(MainSmallApplication.this, "THEME", "Dark");
+							if (mViewType == ViewType.ViewConversation) {
+								setContentViewConversations();
+							}
+							if (mViewType == ViewType.ViewFindContact) {
+								setContentViewFindContact();
+							}
+							
 							break;
 						case R.id.theme_light:
-							MainSmallApplication.this
-									.setAppTheme(com.sony.smallapp.R.style.Theme.Light);
+							MainSmallApplication.this.setAppTheme(com.sony.smallapp.R.style.Theme.Light);
+							ApplicationConstants.ColorText = "#483D8B";
+							Utils.writeSharePreferences(MainSmallApplication.this, "THEME", "Light");
+							if (mViewType == ViewType.ViewConversation) {
+								setContentViewConversations();
+							}
+							if (mViewType == ViewType.ViewFindContact) {
+								setContentViewFindContact();
+							}
 							break;
 						case R.id.settings:
 							Toast.makeText(MainSmallApplication.this, "Setting", Toast.LENGTH_SHORT).show();

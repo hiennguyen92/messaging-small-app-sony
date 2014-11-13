@@ -6,8 +6,10 @@ import java.util.Locale;
 
 import startfirst.smallapp.basic.R;
 import startfirst.smallapp.model.Contact;
+import startfirst.smallapp.widget.ApplicationConstants;
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,7 +59,9 @@ public class ContanctAdapter extends ArrayAdapter<Contact> {
 
 		holder.tvname = (TextView) view.findViewById(R.id.tvname);
 		holder.tvPhoneNo = (TextView) view.findViewById(R.id.tvphone);
-
+		
+		holder.tvname.setTextColor(Color.parseColor(ApplicationConstants.ColorText));
+		holder.tvPhoneNo.setTextColor(Color.parseColor(ApplicationConstants.ColorText));
 		if (holder.tvname != null && null != objBean.getName()
 				&& objBean.getName().trim().length() > 0) {
 			holder.tvname.setText(Html.fromHtml(objBean.getName()));

@@ -1,26 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <EditText
-        android:id="@+id/editTextFindContact"
+    <LinearLayout
+        android:id="@+id/linearLayoutContentFindContact"
         android:layout_width="match_parent"
-        android:layout_height="35dp"
-        android:background="@drawable/round_view_white_ed"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:paddingBottom="3dp"
-        android:paddingLeft="3dp"
-        android:paddingRight="3dp"
-        android:paddingTop="3dp" >
-    </EditText>
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone" >
 
-    <ListView
-        android:id="@+id/listViewFindContact"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-    </ListView>
+        <EditText
+            android:id="@+id/editTextFindContact"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:background="@drawable/round_view_white_ed"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:paddingBottom="3dp"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
+            android:paddingTop="3dp" >
+        </EditText>
 
-</LinearLayout>
+        <ListView
+            android:id="@+id/listViewFindContact"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+        </ListView>
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBarLoadingFindContact"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
+</RelativeLayout>

@@ -1,9 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginLeft="5dp"
-    android:layout_marginRight="5dp" >
+    android:layout_height="match_parent" >
 
     <ListView
         android:id="@+id/ChatListView"
@@ -38,8 +36,8 @@
             android:background="@drawable/btn_send"
             android:gravity="center"
             android:paddingBottom="3dp"
-            android:paddingLeft="3dp"
-            android:paddingRight="3dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
             android:paddingTop="3dp"
             android:text="Send"
             android:clickable="true"

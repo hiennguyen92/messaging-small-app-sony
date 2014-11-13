@@ -5,6 +5,9 @@ import java.util.Date;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.telephony.SmsManager;
 import android.view.animation.AccelerateInterpolator;
@@ -15,6 +18,20 @@ import startfirst.smallapp.model.Conversation;
 
 public class Utils {
 
+	public static boolean writeSharePreferences(Context context, String key,String value){
+		SharedPreferences prefs = context.getSharedPreferences( "Settings", Context.MODE_PRIVATE);
+		Editor edit = prefs.edit();
+		edit.putString(key, value);
+		edit.commit();
+		return true;
+	}
+	
+	public static String readSharePreferences(Context context, String key){
+		SharedPreferences prefs = context.getSharedPreferences( "Settings", Context.MODE_PRIVATE);
+		return prefs.getString(key, "Dark");
+	}
+	
+	
 	
 	public static Animation AnimationFadeIn() {
 		Animation fadeIn = new AlphaAnimation(0, 1);

@@ -3,9 +3,11 @@ package startfirst.smallapp.adapter;
 import java.util.ArrayList;
 
 import startfirst.smallapp.model.Conversation;
+import startfirst.smallapp.widget.ApplicationConstants;
 import startfirst.smallapp.widget.ViewHolder;
 import startfirst.smallapp.basic.R;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,6 +51,8 @@ public class ConversationAdapter extends BaseAdapter{
 		
 		TextView tvTitle = ViewHolder.get(converView, R.id.item_conversation_name);
 		TextView tvContent = ViewHolder.get(converView, R.id.item_conversation_body);
+		tvTitle.setTextColor(Color.parseColor(ApplicationConstants.ColorText));
+		tvContent.setTextColor(Color.parseColor(ApplicationConstants.ColorText));
 		tvTitle.setText(item.getName_Display() != null?item.getName_Display():item.getAddress());
 		tvContent.setText(item.getBody());
 		if (item.getRead() == 0) {
