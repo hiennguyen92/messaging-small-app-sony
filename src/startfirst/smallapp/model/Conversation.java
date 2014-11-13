@@ -31,6 +31,12 @@ public class Conversation implements Serializable{
 		this.mRead = read;
 	}
 	
+	public Conversation(String addr, String name){
+		this.mAddress = addr;
+		this.mName_Display = name;
+	}
+	
+	
 	
 	public String getId() {
 		return mId;

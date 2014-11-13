@@ -7,19 +7,44 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.net.Uri;
 import android.telephony.SmsManager;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.DecelerateInterpolator;
 import startfirst.smallapp.model.Conversation;
 
 public class Utils {
 
-	public static boolean isCheckNew(ArrayList<Conversation> des,
-			ArrayList<Conversation> src) {
-		int size = des.size() > src.size() ? src.size() : des.size();
-		for (int i = 0; i < size; i++) {
-			if (!src.get(i).getBody().equals(des.get(i).getBody())
-					|| src.get(i).getRead() != des.get(i).getRead()) {
-				return true;
+	
+	public static Animation AnimationFadeIn() {
+		Animation fadeIn = new AlphaAnimation(0, 1);
+		fadeIn.setInterpolator(new DecelerateInterpolator()); //add this
+		fadeIn.setDuration(1000);
+		return fadeIn;
+	}
+	
+	public static Animation AnimationFadeOut() {
+		Animation fadeOut = new AlphaAnimation(1, 0);
+		fadeOut.setInterpolator(new AccelerateInterpolator()); //and this
+		fadeOut.setDuration(1000);
+		return fadeOut;
+	}
+	
+	
+	
+	public static boolean isCheckNew(ArrayList<Conversation> src,
+			ArrayList<Conversation> des) {
+		if (des.size() != src.size()) {
+			return true;
+		}else {
+			for (int i = 0; i < des.size(); i++) {
+				if (!src.get(i).getBody().equals(des.get(i).getBody()) || !src.get(i).getAddress().equals(des.get(i).getAddress()) || des.get(i).getRead() != des.get(i).getRead()) {
+					return true;
+				}
 			}
 		}
+
+
 		return false;
 	}
 	

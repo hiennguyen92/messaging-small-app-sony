@@ -4,6 +4,7 @@
     <string name="app_name">Messaging</string>
     <string name="themeDark">Theme Dark</string>
     <string name="themeLight">Theme Light</string>
+    <string name="settings">Settings</string>
     <string name="menu_clicked">Menu item clicked.</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>

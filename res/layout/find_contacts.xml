@@ -7,11 +7,14 @@
     <EditText
         android:id="@+id/editTextFindContact"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="35dp"
+        android:background="@drawable/round_view_white_ed"
         android:ems="10"
-        android:inputType="textPersonName" >
-
-        <requestFocus />
+        android:inputType="textPersonName"
+        android:paddingBottom="3dp"
+        android:paddingLeft="3dp"
+        android:paddingRight="3dp"
+        android:paddingTop="3dp" >
     </EditText>
 
     <ListView

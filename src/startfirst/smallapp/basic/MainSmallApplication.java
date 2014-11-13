@@ -36,8 +36,10 @@ import java.util.Date;
 import java.util.List;
 
 import startfirst.smallapp.adapter.AwesomeAdapter;
+import startfirst.smallapp.adapter.ContanctAdapter;
 //import startfirst.smallapp.adapter.ContanctAdapter;
 import startfirst.smallapp.adapter.ConversationAdapter;
+import startfirst.smallapp.model.Contact;
 //import startfirst.smallapp.model.Contact;
 import startfirst.smallapp.model.Conversation;
 import startfirst.smallapp.model.ConversationRepository;
@@ -82,12 +84,18 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainSmallApplication extends SmallApplication implements
 		OnPositionChangedListener {
@@ -97,6 +105,7 @@ public class MainSmallApplication extends SmallApplication implements
 	ExtendedListView lvConversation;
 	ArrayList<Conversation> mConversations;
 	ConversationAdapter mAdapter;
+	ProgressBar mProgressBarMain;
 
 	ArrayList<SMS> mSMSs;
 	AwesomeAdapter adapter;
@@ -126,11 +135,17 @@ public class MainSmallApplication extends SmallApplication implements
 		optionBack.setVisibility(View.GONE);
 		setContentView(R.layout.main);
 		lvConversation = (ExtendedListView) findViewById(R.id.MainListView);
+		mProgressBarMain = (ProgressBar)findViewById(R.id.MainProgressBar);
+		mProgressBarMain.setVisibility(View.VISIBLE);
 		lvConversation.setCacheColorHint(Color.TRANSPARENT);
 		lvConversation.setOnPositionChangedListener(this);
 		lvConversation.setOnItemClickListener(ConversationClick);
 		if (mConversations != null) {
 			lvConversation.setAdapter(mAdapter);
+			mProgressBarMain.startAnimation(Utils.AnimationFadeOut());
+			mProgressBarMain.setVisibility(View.GONE);
+			lvConversation.setVisibility(View.VISIBLE);
+			lvConversation.startAnimation(Utils.AnimationFadeIn());
 		}
 		AsyncJob.doInBackground(new AsyncJob.OnBackgroundJob() {
 			@Override
@@ -140,8 +155,12 @@ public class MainSmallApplication extends SmallApplication implements
 				AsyncJob.doOnMainThread(new AsyncJob.OnMainThreadJob() {
 					@Override
 					public void doInUIThread() {
-						if (mConversations == null
-								|| Utils.isCheckNew(mConversations, result)) {
+						if (mConversations == null|| Utils.isCheckNew(mConversations, result)) {
+							
+							mProgressBarMain.startAnimation(Utils.AnimationFadeOut());
+							mProgressBarMain.setVisibility(View.GONE);
+							lvConversation.setVisibility(View.VISIBLE);
+							lvConversation.startAnimation(Utils.AnimationFadeIn());
 							mConversations = result;
 							mAdapter = new ConversationAdapter(
 									MainSmallApplication.this, mConversations);
@@ -157,8 +176,8 @@ public class MainSmallApplication extends SmallApplication implements
 		@Override
 		public void onItemClick(AdapterView<?> adapter, View view,
 				int position, long id) {
-			Conversation item = (Conversation) adapter.getAdapter().getItem(
-					position);
+			Conversation item = (Conversation) adapter.getAdapter().getItem(position);
+			mConversations.get(mConversations.indexOf(item)).setRead(1);
 			setContentViewSMS(item);
 		}
 	};
@@ -171,24 +190,41 @@ public class MainSmallApplication extends SmallApplication implements
 		optionBack.setVisibility(View.VISIBLE);
 		optionNew.setVisibility(View.GONE);
 		setContentView(R.layout.chat);
-		setTitle(input.getName_Display() != null ? input.getName_Display()
-				: input.getAddress());
+		setTitle(input.getName_Display() != null ? input.getName_Display(): input.getAddress());
 		final ListView lv = (ListView) findViewById(R.id.ChatListView);
-		AsyncJob.doInBackground(new AsyncJob.OnBackgroundJob() {
-			@Override
-			public void doOnBackground() {
-				mSMSs = ApplicationConstants.getSMSRepository(mContentResolver)
-						.getAllSMSConversation(input.getThread_Id());
-				AsyncJob.doOnMainThread(new AsyncJob.OnMainThreadJob() {
-					@Override
-					public void doInUIThread() {
-						adapter = new AwesomeAdapter(MainSmallApplication.this,
-								mSMSs);
-						lv.setAdapter(adapter);
-					}
-				});
-			}
-		});
+		if (input.getThread_Id() != null) {
+			AsyncJob.doInBackground(new AsyncJob.OnBackgroundJob() {
+				@Override
+				public void doOnBackground() {
+					mSMSs = ApplicationConstants.getSMSRepository(mContentResolver)
+							.getAllSMSConversation(input.getThread_Id());
+					AsyncJob.doOnMainThread(new AsyncJob.OnMainThreadJob() {
+						@Override
+						public void doInUIThread() {
+							adapter = new AwesomeAdapter(MainSmallApplication.this,
+									mSMSs);
+							lv.setAdapter(adapter);
+						}
+					});
+				}
+			});
+		}else {
+			Toast.makeText(MainSmallApplication.this, "Create New COnversation", Toast.LENGTH_SHORT).show();
+			AsyncJob.doInBackground(new AsyncJob.OnBackgroundJob() {
+				@Override
+				public void doOnBackground() {
+					mSMSs = ApplicationConstants.getSMSRepository(mContentResolver).getAllSMSConversationPhone(input.getAddress());
+					AsyncJob.doOnMainThread(new AsyncJob.OnMainThreadJob() {
+						@Override
+						public void doInUIThread() {
+							adapter = new AwesomeAdapter(MainSmallApplication.this,
+									mSMSs);
+							lv.setAdapter(adapter);
+						}
+					});
+				}
+			});
+		}
 		final TextView btnSend = (TextView) findViewById(R.id.btnSend);
 		btnSend.setEnabled(false);
 		final EditText editContent = (EditText) findViewById(R.id.editTextContent);
@@ -204,13 +240,10 @@ public class MainSmallApplication extends SmallApplication implements
 			}
 
 			@Override
-			public void beforeTextChanged(CharSequence arg0, int arg1,
-					int arg2, int arg3) {
-			}
+			public void beforeTextChanged(CharSequence arg0, int arg1,int arg2, int arg3) {}
 
 			@Override
-			public void afterTextChanged(Editable arg0) {
-			}
+			public void afterTextChanged(Editable arg0) {}
 		});
 
 		btnSend.setOnClickListener(new OnClickListener() {
@@ -249,79 +282,6 @@ public class MainSmallApplication extends SmallApplication implements
 		});
 	}
 
-	// class AsyntaskMsg extends AsyncTask<ContentResolver, Void,
-	// ArrayList<Conversation>>{
-	//
-	// @Override
-	// protected void onPreExecute() {
-	// super.onPreExecute();
-	//
-	// }
-	//
-	// @Override
-	// protected ArrayList<Conversation> doInBackground(ContentResolver...
-	// param) {
-	// ArrayList<Conversation> uti = new ArrayList<Conversation>();
-	//
-	// Uri uri = Uri.parse("content://mms-sms/conversations/");
-	// Cursor query = param[0].query(uri, new String[] {"thread_id", "address",
-	// "date", "body", "read" }, null, null, " _id desc");
-	// while (query.moveToNext()) {
-	// String numberPhone = query.getString(1);
-	// uti.add(new Conversation(query.getString(0),numberPhone,
-	// getContactName(param[0], numberPhone), query.getString(2),
-	// query.getString(3), query.getInt(4)));
-	// }
-	// query.close();
-	// return uti;
-	// }
-	//
-	// @Override
-	// protected void onPostExecute(ArrayList<Conversation> result) {
-	// super.onPostExecute(result);
-	// if (mConversations == null || isCheckNew(mConversations, result)) {
-	// mConversations = result;
-	// mAdapter = new ConversationAdapter(MainSmallApplication.this,
-	// mConversations);
-	// lvConversation.setAdapter(mAdapter);
-	// }
-	//
-	// }
-	//
-	// private boolean isCheckNew(ArrayList<Conversation> des,
-	// ArrayList<Conversation> src){
-	// int size = des.size()>src.size()?src.size():des.size();
-	// for (int i = 0; i < size; i++) {
-	// if (!src.get(i).getBody().equals(des.get(i).getBody()) ||
-	// src.get(i).getRead() != des.get(i).getRead()) {
-	// return true;
-	// }
-	// }
-	// return false;
-	// }
-	//
-	//
-	// public String getContactName(ContentResolver cr, String phoneNumber) {
-	// Uri uri =
-	// Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI,Uri.encode(phoneNumber));
-	// Cursor cursor = cr.query(uri,new String[] { PhoneLookup.DISPLAY_NAME },
-	// null, null, null);
-	// if (cursor == null) {
-	// return null;
-	// }
-	// String contactName = null;
-	// if (cursor.moveToFirst()) {
-	// contactName = cursor.getString(0);
-	// }
-	// if (cursor != null && !cursor.isClosed()) {
-	// cursor.close();
-	// }
-	// return contactName;
-	// }
-	//
-	//
-	//
-	// }
 
 	@SuppressLint("SimpleDateFormat")
 	@SuppressWarnings("deprecation")
@@ -355,57 +315,69 @@ public class MainSmallApplication extends SmallApplication implements
 		mClock.onTimeChanged(timeObj);
 	}
 
-	// private List<Contact> list = new ArrayList<Contact>();
-	// private void setContentViewFindContact(){
-	// optionBack.setVisibility(View.VISIBLE);
-	// optionNew.setVisibility(View.GONE);
-	// setTitle("Choice Contact");
-	// setContentView(R.layout.find_contacts);
-	// EditText editText = (EditText)findViewById(R.id.editTextFindContact);
-	// ListView lv = (ListView)findViewById(R.id.listViewFindContact);
-	//
-	// Cursor phones =
-	// getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-	// null, null,null, null);
-	// while (phones.moveToNext()) {
-	//
-	// String name =
-	// phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-	//
-	// String phoneNumber =
-	// phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-	//
-	// Contact objContact = new Contact();
-	// objContact.setName(name);
-	// objContact.setPhoneNo(phoneNumber);
-	// list.add(objContact);
-	//
-	// }
-	// phones.close();
-	//
-	//
-	// final ContanctAdapter objAdapter = new
-	// ContanctAdapter(MainSmallApplication.this, R.layout.alluser_row, list);
-	//
-	// lv.setAdapter(objAdapter);
-	//
-	// editText.addTextChangedListener(new TextWatcher() {
-	// @Override
-	// public void onTextChanged(CharSequence s, int start, int before, int
-	// count) {
-	// objAdapter.filter(s.toString());
-	// }
-	// @Override
-	// public void beforeTextChanged(CharSequence s, int start, int count,int
-	// after) {}
-	// @Override
-	// public void afterTextChanged(Editable arg0) {}
-	// });
-	//
-	//
-	//
-	//
-	// }
+	 private List<Contact> listContact = new ArrayList<Contact>();
+	private void setContentViewFindContact() {
+		mViewType = ViewType.ViewFindContact;
+		optionBack.setVisibility(View.VISIBLE);
+		optionNew.setVisibility(View.GONE);
+		setTitle("Choice Contact");
+		setContentView(R.layout.find_contacts);
+		EditText editText = (EditText) findViewById(R.id.editTextFindContact);
+		ListView lv = (ListView) findViewById(R.id.listViewFindContact);
+
+		Cursor phones = getContentResolver().query(
+				ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null,
+				null, null);
+		while (phones.moveToNext()) {
+
+			String name = phones
+					.getString(phones
+							.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+
+			String phoneNumber = phones
+					.getString(phones
+							.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+
+			Contact objContact = new Contact();
+			objContact.setName(name);
+			objContact.setPhoneNo(phoneNumber);
+			listContact.add(objContact);
+
+		}
+		phones.close();
+
+		final ContanctAdapter objAdapter = new ContanctAdapter(
+				MainSmallApplication.this, R.layout.alluser_row, listContact);
+
+		lv.setAdapter(objAdapter);
+		lv.setOnItemClickListener(ContactItemClick);
+
+		editText.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before,
+					int count) {
+				objAdapter.filter(s.toString());
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+			}
+
+			@Override
+			public void afterTextChanged(Editable arg0) {
+			}
+		});
+
+	}
+	OnItemClickListener ContactItemClick = new OnItemClickListener() {
+		@Override
+		public void onItemClick(AdapterView<?> lv, View v, int position, long id) {
+			Contact item = ((ContanctAdapter)lv.getAdapter()).getItem(position);
+			Conversation temp = new Conversation(item.getPhoneNo(), item.getName());
+			setContentViewSMS(temp);
+		}
+	};
 
 	private void setAppTheme(int theme) {
 		if (SdkInfo.VERSION.API_LEVEL >= 2) {
@@ -440,7 +412,7 @@ public class MainSmallApplication extends SmallApplication implements
 		optionNew.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				// setContentViewFindContact();
+				setContentViewFindContact();
 			}
 		});
 		optionBack = header.findViewById(R.id.option_back);
@@ -471,6 +443,9 @@ public class MainSmallApplication extends SmallApplication implements
 							MainSmallApplication.this
 									.setAppTheme(com.sony.smallapp.R.style.Theme.Light);
 							break;
+						case R.id.settings:
+							Toast.makeText(MainSmallApplication.this, "Setting", Toast.LENGTH_SHORT).show();
+							break;
 						default:
 							break;
 						}
@@ -485,36 +460,6 @@ public class MainSmallApplication extends SmallApplication implements
 		getWindow().setHeaderView(header);
 	}
 
-	//
-	// private void markMessageRead(Context context, String number, String body)
-	// {
-	//
-	// Uri uri = Uri.parse("content://sms/inbox");
-	// Cursor cursor = context.getContentResolver().query(uri, new String[] {
-	// "_id", "address", "body","read" }, null,
-	// null, null);
-	// try {
-	//
-	// while (cursor.moveToNext()) {
-	// if ((cursor.getString(cursor.getColumnIndex("address")).equals(number))
-	// && (cursor.getInt(cursor.getColumnIndex("read")) == 0)) {
-	// if (cursor.getString(cursor.getColumnIndex("body")).startsWith(body)) {
-	// String SmsMessageId = cursor.getString(cursor.getColumnIndex("_id"));
-	// ContentValues values = new ContentValues();
-	// values.put("read", true);
-	// context.getContentResolver().update(
-	// Uri.parse("content://sms/inbox"), values,
-	// "_id=" + SmsMessageId, null);
-	// return;
-	// }
-	// }
-	// }
-	// cursor.close();
-	// } catch (Exception e) {
-	// e.printStackTrace();
-	// Log.e("Mark Read", "Error in Read: " + e.toString());
-	// }
-	// }
 
 	private BroadcastReceiver IncomingSms = new BroadcastReceiver() {
 		@Override
@@ -540,67 +485,28 @@ public class MainSmallApplication extends SmallApplication implements
 						if (getWindow().getWindowState() == WindowState.MINIMIZED) {
 							getWindow().setWindowState(WindowState.NORMAL);
 						}
-						if (mViewType == ViewType.ViewSMS) {
-							if (currentMessage.getDisplayOriginatingAddress()
-									.equals(mAddressCurrent)) {
-								mSMSs.add(
-										0,
-										new SMS(null, mAddressCurrent,
-												currentMessage
-														.getTimestampMillis()
-														+ "", currentMessage
-														.getMessageBody(), 1, 1));
+						switch (mViewType) {
+						case ViewSMS:
+							if (currentMessage.getDisplayOriginatingAddress().equals(mAddressCurrent)) {
+								mSMSs.add(0,new SMS(null, mAddressCurrent,currentMessage.getTimestampMillis()+ "", currentMessage.getMessageBody(), 1, 1));
 								adapter.notifyDataSetChanged();
 							}
-						} else {
-							if (mViewType == ViewType.ViewConversation) {
-								lvConversation.setAdapter(mAdapter);
-								new Handler().postAtTime(new Runnable() {
-									@Override
-									public void run() {
-										AsyncJob.doInBackground(new AsyncJob.OnBackgroundJob() {
-											@Override
-											public void doOnBackground() {
-												mConversations = ApplicationConstants.getConversationRepository(mContentResolver).getAll();
-												AsyncJob.doOnMainThread(new AsyncJob.OnMainThreadJob() {
-													@Override
-													public void doInUIThread() {
-														mAdapter.notifyDataSetChanged();
-													}
-												});
-											}
-										});
-									}
-								}, 3000);
-							}
+							break;
+						case ViewConversation:
+							new Handler().postDelayed(new Runnable() {
+								@Override
+								public void run() {
+									setContentViewConversations();
+								}
+							}, 2000);
+							
+							break;
+
+						default:
+							break;
 						}
 
-					} // end for loop
-					// new Handler().postDelayed(new Runnable() {
-					// @Override
-					// public void run() {
-					// lvConversation.setAdapter(mAdapter);
-					// new AsyntaskMsg().execute(contentResolver);
-					// }
-					// }, 3000);
-					// smsofconversation.clear();
-					// Cursor smsCur =
-					// contentResolver.query(Uri.parse("content://sms/"),
-					// new String[] { "address", "date", "body", "type","read"
-					// },
-					// "thread_id=" + IDThreadCurrent, null, null);
-					// while (smsCur.moveToNext()) {
-					// smsofconversation.add(new SMS(smsCur.getString(0),
-					// smsCur.getString(1), smsCur.getString(2),
-					// smsCur.getInt(3)));
-					// if (smsCur.getInt(4) == 0) {
-					// markMessageRead(MainSmallApplication.this,
-					// smsCur.getString(0), smsCur.getString(2));
-					// }
-					//
-					// }
-					// smsCur.close();
-					// adapter.notifyDataSetChanged();
+					}
 				} // bundle is null
 			} catch (Exception e) {
 				Log.e("SmsReceiver", "Exception smsReceiver" + e);

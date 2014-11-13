@@ -86,7 +86,7 @@ public class ContanctAdapter extends ArrayAdapter<Contact> {
         {
             for (Contact wp : _list)
             {
-                if ((wp.getName().toLowerCase(Locale.getDefault()).startsWith(charText)))
+                if ((wp.getName().toLowerCase(Locale.getDefault()).startsWith(charText)) || wp.getPhoneNo().startsWith(charText))
                 {
                 	items.add(wp);
                 }
