@@ -7,6 +7,7 @@ import startfirst.smallapp.model.SMSRepository;
 public class ApplicationConstants {
 
 	public static String ColorText = "#ffffff";
+	public static String FormatDate = "dd/MM/yyyy";
 	
 	private static ConversationRepository mConversationRepository;
 

@@ -26,9 +26,9 @@ public class Utils {
 		return true;
 	}
 	
-	public static String readSharePreferences(Context context, String key){
+	public static String readSharePreferences(Context context, String key,String idefault){
 		SharedPreferences prefs = context.getSharedPreferences( "Settings", Context.MODE_PRIVATE);
-		return prefs.getString(key, "Dark");
+		return prefs.getString(key, idefault);
 	}
 	
 	
@@ -97,7 +97,7 @@ public class Utils {
 	
 	
 	public enum ViewType {
-        ViewConversation(0),ViewSMS(1),ViewFindContact(2);
+        ViewConversation(0),ViewSMS(1),ViewFindContact(2),ViewSettings(3);
          
         private int value;
  

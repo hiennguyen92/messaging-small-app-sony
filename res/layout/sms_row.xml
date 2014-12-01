@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@android:color/darker_gray"
+        android:textColor="#483D8B"
         android:textSize="10sp" />
 
 </LinearLayout>

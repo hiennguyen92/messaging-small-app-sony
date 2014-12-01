@@ -97,6 +97,9 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -116,7 +119,8 @@ public class MainSmallApplication extends SmallApplication implements
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		String theme = Utils.readSharePreferences(MainSmallApplication.this, "THEME");
+		ApplicationConstants.FormatDate = Utils.readSharePreferences(MainSmallApplication.this, "FORMAT", "dd/MM/yyyy");
+		String theme = Utils.readSharePreferences(MainSmallApplication.this, "THEME", "Dark");
 		if (theme.equals("Dark")) {
 			setAppTheme(com.sony.smallapp.R.style.Theme.Dark);
 			ApplicationConstants.ColorText = "#ffffff";
@@ -151,10 +155,10 @@ public class MainSmallApplication extends SmallApplication implements
 		lvConversation.setOnPositionChangedListener(this);
 		lvConversation.setOnItemClickListener(ConversationClick);
 //		if (ApplicationConstants.ColorText.equals("#ffffff")) {//Light
-//			lvConversation.setDividerHeight(1);
+//			lvConversation.setDividerHeight(5);
 //			lvConversation.setDivider(getResources().getDrawable(R.drawable.divider_light));
 //		}else {
-//			lvConversation.setDividerHeight(1);
+//			lvConversation.setDividerHeight(5);
 //			lvConversation.setDivider(getResources().getDrawable(R.drawable.divider_light));
 //		}
 		
@@ -328,7 +332,7 @@ public class MainSmallApplication extends SmallApplication implements
 		TextView tv = (TextView) scrollBarPanel.findViewById(R.id.timeTextView);
 		TextView tvdate = (TextView) scrollBarPanel
 				.findViewById(R.id.datetextView);
-		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		DateFormat dateFormat = new SimpleDateFormat(ApplicationConstants.FormatDate);
 		DateFormat timeFormat = new SimpleDateFormat("HH:mm");
 		tv.setText(timeFormat.format(time));
 		tvdate.setText(dateFormat.format(time));
@@ -438,6 +442,52 @@ public class MainSmallApplication extends SmallApplication implements
 		super.onDestroy();
 		unregisterReceiver(IncomingSms);
 	}
+	
+	private void setContentViewSettings(){
+		mViewType = ViewType.ViewSettings;
+		optionBack.setVisibility(View.VISIBLE);
+		optionNew.setVisibility(View.GONE);
+		setTitle("Settings");
+		setContentView(R.layout.settings);
+		TextView tvTitle = (TextView)findViewById(R.id.textViewTitleSettings);
+		RadioGroup groupradio = (RadioGroup)findViewById(R.id.radioGroupSettingsFormatDate);
+		RadioButton btnddMM = (RadioButton)findViewById(R.id.radioddMM);
+		RadioButton btnMMdd = (RadioButton)findViewById(R.id.radioMMdd);
+		tvTitle.setTextColor(Color.parseColor(ApplicationConstants.ColorText));
+		btnddMM.setTextColor(Color.parseColor(ApplicationConstants.ColorText));
+		btnMMdd.setTextColor(Color.parseColor(ApplicationConstants.ColorText));
+		
+		
+		if (ApplicationConstants.FormatDate.equals("dd/MM/yyyy")) {
+			btnddMM.setChecked(true);
+		}else {
+			btnMMdd.setChecked(true);
+		}
+		
+		
+		groupradio.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+				switch (checkedId) {
+				case R.id.radioddMM:
+					Utils.writeSharePreferences(MainSmallApplication.this, "FORMAT", "dd/MM/yyyy");
+					ApplicationConstants.FormatDate = "dd/MM/yyyy";
+					break;
+				case R.id.radioMMdd:
+					Utils.writeSharePreferences(MainSmallApplication.this, "FORMAT", "MM/dd/yyyy");
+					ApplicationConstants.FormatDate = "MM/dd/yyyy";
+					break;
+				default:
+					break;
+				}
+			}
+		});
+		
+		
+	}
+	
+	
+	
 
 	View optionBack, optionMenu, optionNew;
 
@@ -495,7 +545,7 @@ public class MainSmallApplication extends SmallApplication implements
 							}
 							break;
 						case R.id.settings:
-							Toast.makeText(MainSmallApplication.this, "Setting", Toast.LENGTH_SHORT).show();
+							setContentViewSettings();
 							break;
 						default:
 							break;

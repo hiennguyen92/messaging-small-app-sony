@@ -8,6 +8,7 @@ import java.util.Date;
 
 import startfirst.smallapp.basic.R;
 import startfirst.smallapp.model.SMS;
+import startfirst.smallapp.widget.ApplicationConstants;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
@@ -80,7 +81,7 @@ public class AwesomeAdapter extends BaseAdapter{
 			val = new Date(message.getDate()).getTime();
 		}
 		Date date = new Date(val);
-		SimpleDateFormat df2 = new SimpleDateFormat("HH:mm dd/MM/yyyy");
+		SimpleDateFormat df2 = new SimpleDateFormat("HH:mm "+ApplicationConstants.FormatDate);
 		tvTime.setText(df2.format(date));
 		llLayout.setLayoutParams(lp);
 		return convertView;
