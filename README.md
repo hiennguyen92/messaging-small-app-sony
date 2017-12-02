@@ -1,29 +1,6 @@
-# README #
+# INFO #
+this is small app extension for sony xperia
 
-This README would normally document whatever steps are necessary to get your application up and running.
+https://play.google.com/store/search?q=small%20apps%20extension%20for%20sony%20products
 
-### What is this repository for? ###
-
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
-
-### How do I get set up? ###
-
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+https://play.google.com/store/apps/details?id=startfirst.smallapp.basic
