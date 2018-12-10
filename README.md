@@ -2,7 +2,7 @@
 This is my old source code repository
 
 <p align="center">
-  <a href="https://play.google.com/store/apps/details?id=startfirst.smallapp.basic"><img src="https://cdn.rawgit.com/steverichey/google-play-badge-svg/master/img/fr_get.svg" width="20%"></a></br>
+  <a href="https://play.google.com/store/apps/details?id=startfirst.smallapp.basic"><img src="https://cdn.jsdelivr.net/gh/steverichey/google-play-badge-svg@master/img/fr_get.svg" width="20%"></a></br>
   https://play.google.com/store/apps/details?id=startfirst.smallapp.basic
 </p>
 
